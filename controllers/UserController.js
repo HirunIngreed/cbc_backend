@@ -5,20 +5,31 @@ import bcrypt from 'bcrypt';
 export async function createUser(req,res){
 
 try{
+    if (!req.body.firstName||!req.body.lastName||!req.body.email||!req.body.password) {
+        res.status(400).json(
+            {
+                message : "Something went wrong. Please fill in the required fields before submitting."
+            }
+        )
+        return
+    }
+
+   
 
     if (req.body.role == "admin") {
         if (!isAdmin(req)) {
-            res.json(
+            res.status(400).json(
                 {
                     message : "You can't creat admin accounts"
                 }
             )
+            return
         }
     }
 
     const duplicateUser = await User.findOne({email:req.body.email})
         if (duplicateUser) {
-            res.json(
+            res.status(400).json(
                 {
                     message : "The email you enterd is elready used"
                 }
@@ -85,11 +96,12 @@ try{
                     res.json(
                         {
                             message : "Login successfull",
-                            token : token
+                            token : token,
+                            role : user.role
                         }
                     )
                        }else{
-                        res.status(403).json(
+                        res.status(401).json(
                             {
                                 message : "Password is incorrect"
                             }

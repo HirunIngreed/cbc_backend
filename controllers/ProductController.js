@@ -50,27 +50,24 @@ try{
 }
 
 export async function retrieveProduct(req,res){
-    try{
-    if (isAdmin(req)) {
+  
         const products = await Product.find()
+        const transformedProducts = products.map((product) => ({
+      ...product.toObject(),
+      isAvailable: product.isAvailable ? "Yes" : "No"
+    }));
+
         res.json(
             {
-                products : products
+                products : transformedProducts
             }
         )
         return
+        
     }
-    const products = await Product.find({isAvailable : true})
-    res.json(
-        {
-            products : products
-        }
-    )
+   
 
-}catch(err){
-    console.log(err)
-}
-}
+
 
 export async function retrieveProductById(req,res){
     const product = await Product.findOne({productId : req.params.productId})
